@@ -1,0 +1,10 @@
+version: '2.2'
+services:
+  flask-restx:
+    build: .
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+    - 25904:80
+    mem_limit: 4096m
+    cpus: '4'

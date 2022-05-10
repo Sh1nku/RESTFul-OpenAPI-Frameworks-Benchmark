@@ -1,0 +1,6 @@
+### Gradle ###
+.gradle
+build/*
+.idea/*
+tmp/*
+gradle/*

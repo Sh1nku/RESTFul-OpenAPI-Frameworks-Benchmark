@@ -1,0 +1,68 @@
+buildscript {
+  ext {
+    
+    joobyVersion = "2.14.1"
+  }
+
+  dependencies {
+    classpath "io.jooby:jooby-gradle-plugin:$joobyVersion"
+  }
+}
+
+plugins {
+  id "application"
+  id "io.jooby.run" version "${joobyVersion}"
+  id "io.spring.dependency-management" version "1.0.11.RELEASE"
+  id "com.google.osdetector" version "1.7.0"
+  id "com.github.johnrengelman.shadow" version "7.0.0"
+  id "io.jooby.openAPI" version "${joobyVersion}"
+}
+
+group "app"
+version "1.0.0"
+mainClassName = "app.App"
+sourceCompatibility = 11
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "io.jooby:jooby-bom:$joobyVersion"
+  }
+}
+
+dependencies {
+  annotationProcessor "io.jooby:jooby-apt"
+  implementation "io.jooby:jooby-netty"
+  implementation "ch.qos.logback:logback-classic"
+  implementation 'io.swagger.core.v3:swagger-annotations:2.1.13'
+  implementation "io.jooby:jooby-jackson:$joobyVersion"
+  implementation "io.jooby:jooby-swagger-ui:$joobyVersion"
+}
+
+joobyRun.dependsOn openAPI
+jar.dependsOn openAPI
+
+compileJava {
+  options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+/** Java debug information: */
+tasks.withType(JavaCompile) {
+  options.compilerArgs += [
+    '-parameters',
+    '-Ajooby.incremental=true',
+    '-Ajooby.services=true',
+    '-Ajooby.debug=false'
+  ]
+  options.debug = true
+}
+
+
+shadowJar {
+  mergeServiceFiles()
+}
+

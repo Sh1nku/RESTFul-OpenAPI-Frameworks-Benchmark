@@ -1,0 +1,4 @@
+flask_restx==0.5.1
+requests==2.27.1
+Werkzeug<2.1,>=2.0
+gunicorn

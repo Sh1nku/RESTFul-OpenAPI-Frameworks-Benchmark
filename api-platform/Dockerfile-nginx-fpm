@@ -1,0 +1,29 @@
+FROM php:7.4-fpm-alpine
+WORKDIR /srv/api_platform
+
+RUN apk add --no-cache libzip-dev nginx curl-dev
+RUN mkdir -p /run/nginx
+RUN docker-php-ext-configure opcache --enable-opcache \
+    && docker-php-ext-install zip opcache curl
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+RUN sed -i 's/pm = dynamic/pm = static/g' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/pm.max_children = 5/pm.max_children = 20/g' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/;pm.max_requests = 500/pm.max_requests = 5000/g' /usr/local/etc/php-fpm.d/www.conf
+RUN echo "access.log = /dev/null" >> /usr/local/etc/php-fpm.d/www.conf
+
+COPY ./composer.json ./composer.lock ./
+COPY ./symfony.lock ./
+COPY ./bin ./bin
+COPY ./config ./config
+COPY ./public ./public
+COPY ./src ./src
+COPY ./templates ./templates
+COPY ./.env ./
+COPY ./nginx-fpm-start.sh ./
+COPY ./nginx.conf ./
+
+RUN curl -sSL https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer | php -- --quiet
+RUN ./composer.phar install
+
+CMD ["./nginx-fpm-start.sh"]

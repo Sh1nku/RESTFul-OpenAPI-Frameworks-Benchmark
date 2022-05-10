@@ -1,0 +1,107 @@
+version: '2.4'
+services:
+# Setup
+  bombardier:
+    build: main-application
+    environment:
+      - PYTHONUNBUFFERED=1
+    mem_limit: 4096m
+    cpus: 4.0
+    depends_on:
+      - solr
+      - varnish
+  zookeeper:
+    image: zookeeper:3.4
+    hostname: zookeeper
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+      ZOO_SERVERS: 'server.1=zookeeper:2888:3888'
+    command: sh -c "zkServer.sh start && tail -f /dev/null"
+  solr:
+    image: solr:8.11
+    hostname: solr
+    ports:
+      - 25900:8983
+    command: sh -c "bin/solr start -q && tail -f /dev/null"
+    environment:
+      ZK_HOST: 'zookeeper'
+      SOLR_JAVA_MEM: "-Xms1g -Xmx1g"
+    depends_on:
+      - zookeeper
+  varnish:
+    image: varnish:stable
+    container_name: varnish
+    volumes:
+      - "./varnish.vcl:/etc/varnish/default.vcl"
+    ports:
+      - 25901:80
+    depends_on:
+      - solr
+
+# Frameworks
+  api_platform_nginx_fpm:
+    build:
+      context: api-platform/
+      dockerfile: Dockerfile-nginx-fpm
+    ports:
+      - 25902:80
+    mem_limit: 4096m
+    cpus: 4.0
+    logging:
+      driver: none
+  api_platform_apache:
+    build:
+      context: api-platform/
+      dockerfile: Dockerfile-apache
+    ports:
+      - 25903:80
+    mem_limit: 4096m
+    cpus: 4.0
+    logging:
+      driver: none
+  asp_net_core:
+    build: AspNetCore
+    ports:
+      - 25904:80
+    mem_limit: 4096m
+    cpus: 4.0
+  rust_actix:
+    container_name: rust_actix
+    build: rust-actix
+    ports:
+      - 25905:8080
+    mem_limit: 4096m
+    cpus: 4.0
+  flask_restx:
+    build: flask-restx
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - 25906:80
+    mem_limit: 4096m
+    cpus: 4.0
+  nestjs_fastify:
+    build: nestjs-fastify
+    ports:
+      - 25907:8080
+    mem_limit: 4096m
+    cpus: 4.0
+  fastapi:
+    build: fastapi
+    ports:
+      - 25908:80
+    mem_limit: 4096m
+    cpus: 4.0
+  oatpp:
+    build: oatpp
+    ports:
+      - 25909:8000
+    mem_limit: 4096m
+    cpus: 4.0
+  jooby:
+    build: jooby
+    ports:
+      - 25910:8080
+    mem_limit: 4096m
+    cpus: 4.0

@@ -1,0 +1,9 @@
+version: '3.6'
+services:
+  rust_actix:
+    container_name: rust_actix_local
+    build: .
+    ports:
+      - 25904:8080
+    restart: unless-stopped
+    #command: ['tail', '-f', '/dev/null']
