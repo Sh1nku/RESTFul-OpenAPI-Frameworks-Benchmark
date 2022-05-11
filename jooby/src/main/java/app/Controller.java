@@ -35,7 +35,6 @@ public class Controller {
     @ApiResponse(responseCode = "200", content = {
             @Content(mediaType = MediaType.TEXT, schema = @Schema(type = "string"))
     })
-    @ApiResponse(responseCode = "400")
     public String hello_world() {
         return "Hello World";
     }
@@ -46,6 +45,7 @@ public class Controller {
             summary = "Serializing  a json document",
             parameters = @Parameter(description = "Some example values: <ul><li><code>1</code></li></ul>", required = true)
     )
+    @ApiResponse(responseCode = "400")
     public Entity[] json_serialization(@QueryParam int document_type) throws JsonProcessingException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(api_url+"/solr/performance/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:"+document_type))
