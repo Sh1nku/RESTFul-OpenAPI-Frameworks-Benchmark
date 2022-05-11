@@ -7,6 +7,7 @@ import io.jooby.MediaType;
 import io.jooby.annotations.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,9 +43,11 @@ public class Controller {
 
     @GET(value = "json_serialization")
     @Operation(
-            summary = "Serializing  a json document",
-            parameters = @Parameter(description = "Some example values: <ul><li><code>1</code></li></ul>", required = true)
+            summary = "Serializing  a json document"
     )
+    @Parameters({
+            @Parameter(description = "Some example values: <ul><li><code>1</code></li></ul>", required = true, name = "document_type")
+    })
     @ApiResponse(responseCode = "400")
     public Entity[] json_serialization(@QueryParam int document_type) throws JsonProcessingException {
         HttpRequest request = HttpRequest.newBuilder()
