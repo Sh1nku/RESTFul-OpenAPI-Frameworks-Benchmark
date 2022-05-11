@@ -13,10 +13,12 @@ I have three benchmarks
 * JSON Serialization: Tests the framework in delivering a large JSON document
 * Anonymization: Tests taking a large document, and iterating through, anonymizing data if a requirement is met
 
+I also wrote a [blog post](https://inobstudios.com/Post/8/A%20benchmark%20of%20OpenAPI-Capable%20RESTful%20frameworks) on the frameworks
+
 ## Frameworks
 
 For running the benchmarks I used [Bombardier](https://github.com/codesenberg/bombardier) <br>
-The different frameworkds are as follows
+The different frameworks are as follows
 
 
 |      Framework       | Language | Notes       | Stars |
