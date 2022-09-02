@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display, Formatter};
-use rocket::form::FromForm;
-use rocket::{error, get, post, Request, response, Response, serde::json::Json};
+use rocket::form::{FromForm, FromFormField};
+use rocket::{get, post, Request, response, Response, serde::json::Json};
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use rocket_okapi::settings::UrlObject;
@@ -65,10 +65,12 @@ fn hello_world() -> &'static str {
 #[derive(Serialize, Deserialize, JsonSchema, FromForm)]
 struct Info {
     /// Some example values: <ul><li><code>1</code></li></ul>
-    document_type: i32,
+    document_type: Option<i32>,
 }
 
-pub struct BadRequest {}
+pub struct BadRequest {
+    message: String
+}
 impl OpenApiResponderInner for BadRequest {
     fn responses(_generator: &mut OpenApiGenerator) -> Result<Responses, OpenApiError> {
         use rocket_okapi::okapi::openapi3::{RefOr, Response as OpenApiReponse};
@@ -104,7 +106,7 @@ impl std::error::Error for BadRequest {}
 
 impl<'r> Responder<'r, 'static> for BadRequest {
     fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
-        let body = "Error";
+        let body = self.message;
         Response::build()
             .sized_body(body.len(), std::io::Cursor::new(body))
             .header(ContentType::Plain)
@@ -119,7 +121,11 @@ impl<'r> Responder<'r, 'static> for BadRequest {
 ///
 /// Serializing a json document
 async fn json_serialization(info: Info) -> Result<Json<Vec<Entity>>, BadRequest> {
-    let url: String = format!("{host}/solr/performance/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:{document_type}", host=HOST, document_type=info.document_type);
+    let document_type = match info.document_type {
+        Some(ret) => ret,
+        None => {return Err(BadRequest {message: "Required parameter not found or incorrect: document_type".to_string()})}
+    };
+    let url: String = format!("{host}/solr/performance/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:{document_type}", host=HOST, document_type=document_type);
     let solr = ClientBuilder::new().build().unwrap()
         .get(url)
         .send()
