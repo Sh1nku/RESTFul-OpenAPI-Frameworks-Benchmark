@@ -65,6 +65,8 @@ fn hello_world() -> &'static str {
 #[derive(Serialize, Deserialize, JsonSchema, FromForm)]
 struct Info {
     /// Some example values: <ul><li><code>1</code></li></ul>
+    // Required to be both Optional<T> for route to match even if not given, and #[schemars(required)] to show as required in swagger ui
+    #[schemars(required)]
     document_type: Option<i32>,
 }
 
