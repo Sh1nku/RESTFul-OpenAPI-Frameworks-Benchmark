@@ -21,15 +21,16 @@ For running the benchmarks I used [Bombardier](https://github.com/codesenberg/bo
 The different frameworks are as follows
 
 
-|      Framework       | Language | Notes       | Stars |
-|----------------------|----------|-------------|-------|
-|Actix                 |Rust      | Using the Paperclip plugin for OpenAPI | ![GitHub Repo stars](https://img.shields.io/github/stars/actix/actix?style=social) |
-|Asp.Net Core          |C#        | Using Swashbuckle for OpenAPI          | ![GitHub Repo stars](https://img.shields.io/github/stars/dotnet/aspnetcore?style=social) |
-|Oat++                 |C++       | | ![GitHub Repo stars](https://img.shields.io/github/stars/oatpp/oatpp?style=social)
-|Jooby                 |Java      | Using Jackson for JSON serialization and OpenAPI plugin for OpenAPI  | ![GitHub Repo stars](https://img.shields.io/github/stars/jooby-project/jooby?style=social) |
-|NestJS-Fastify        |Typescript| | ![GitHub Repo stars](https://img.shields.io/github/stars/nestjs/nest?style=social)   
-|FastAPI               |Python    |             | ![GitHub Repo stars](https://img.shields.io/github/stars/nestjs/nest?style=social) |
-|Flask-Restx           |Python    | Using Restx for OpenAPI                | ![GitHub Repo stars](https://img.shields.io/github/stars/pallets/flask?style=social)
+|      Framework       | Language | Notes       | Stars                                                                                            |
+|----------------------|----------|-------------|--------------------------------------------------------------------------------------------------|
+|Actix                 |Rust      | Using the Paperclip plugin for OpenAPI | ![GitHub Repo stars](https://img.shields.io/github/stars/actix/actix?style=social)               |
+|Rocket                |Rust      | Using okapi for OpenAPI | ![Github Repo stars](https://img.shields.io/github/stars/SergioBenitez/Rocket?style=social)      | 
+|Asp.Net Core          |C#        | Using Swashbuckle for OpenAPI          | ![GitHub Repo stars](https://img.shields.io/github/stars/dotnet/aspnetcore?style=social)         |
+|Oat++                 |C++       | | ![GitHub Repo stars](https://img.shields.io/github/stars/oatpp/oatpp?style=social)               
+|Jooby                 |Java      | Using Jackson for JSON serialization and OpenAPI plugin for OpenAPI  | ![GitHub Repo stars](https://img.shields.io/github/stars/jooby-project/jooby?style=social)       |
+|NestJS-Fastify        |Typescript| | ![GitHub Repo stars](https://img.shields.io/github/stars/nestjs/nest?style=social)               
+|FastAPI               |Python    |             | ![GitHub Repo stars](https://img.shields.io/github/stars/nestjs/nest?style=social)               |
+|Flask-Restx           |Python    | Using Restx for OpenAPI                | ![GitHub Repo stars](https://img.shields.io/github/stars/pallets/flask?style=social)             
 |API Platform Nginx-FPM|PHP       | The framework had to be brutalized to get the "Hello World" benchmark to work | ![GitHub Repo stars](https://img.shields.io/github/stars/api-platform/api-platform?style=social) |
 |API Platform Apache   |PHP       | ^ | ![GitHub Repo stars](https://img.shields.io/github/stars/api-platform/api-platform?style=social) |
 
