@@ -13,8 +13,8 @@ use rocket_okapi::okapi::openapi3::Responses;
 use rocket_okapi::response::OpenApiResponderInner;
 use crate::schemars::Map;
 
-//const HOST: &str = "http://varnish";
-const HOST: &str = "http://localhost:25900";
+const HOST: &str = "http://varnish";
+//const HOST: &str = "http://localhost:25900";
 
 #[derive(Serialize, Deserialize, JsonSchema)]
 struct SolrResponse {
