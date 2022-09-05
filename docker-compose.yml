@@ -105,3 +105,10 @@ services:
       - 25910:8080
     mem_limit: 4096m
     cpus: 4.0
+  rust_rocket:
+    build: rust-rocket
+    ports:
+      - 25911:8080
+    mem_limit: 4096m
+    cpus: 4.0
+
