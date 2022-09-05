@@ -1,22 +1,20 @@
 use std::fmt::{Debug, Display, Formatter};
-use rocket::form::{FromForm, FromFormField};
-use rocket::{get, post, Request, response, Response, serde::json::Json};
+use rocket::form::{FromForm};
+use rocket::{get, Request, response, Response, serde::json::Json, State};
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
-use rocket_okapi::settings::UrlObject;
 use rocket_okapi::{openapi, openapi_get_routes, OpenApiError, swagger_ui::*};
 use serde::{Deserialize, Serialize};
-use reqwest::ClientBuilder;
+use reqwest::{Client};
 use rocket::http::{ContentType, Status};
 use rocket::response::Responder;
-use rocket::serde::json::serde_json;
 use rocket_okapi::gen::OpenApiGenerator;
 use rocket_okapi::okapi::openapi3::Responses;
 use rocket_okapi::response::OpenApiResponderInner;
 use crate::schemars::Map;
 
-const HOST: &str = "http://varnish";
-//const HOST: &str = "http://localhost:25900";
+//const HOST: &str = "http://varnish";
+const HOST: &str = "http://localhost:25900";
 
 #[derive(Serialize, Deserialize, JsonSchema)]
 struct SolrResponse {
@@ -93,13 +91,13 @@ impl OpenApiResponderInner for BadRequest {
 }
 
 impl Debug for BadRequest {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
         todo!()
     }
 }
 
 impl Display for BadRequest {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
         todo!()
     }
 }
@@ -122,13 +120,13 @@ impl<'r> Responder<'r, 'static> for BadRequest {
 /// # Json Serialization
 ///
 /// Serializing a json document
-async fn json_serialization(info: Info) -> Result<Json<Vec<Entity>>, BadRequest> {
+async fn json_serialization(info: Info, client: &State<Client>) -> Result<Json<Vec<Entity>>, BadRequest> {
     let document_type = match info.document_type {
         Some(ret) => ret,
         None => {return Err(BadRequest {message: "Required parameter not found or incorrect: document_type".to_string()})}
     };
     let url: String = format!("{host}/solr/performance/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:{document_type}", host=HOST, document_type=document_type);
-    let solr = ClientBuilder::new().build().unwrap()
+    let solr = client
         .get(url)
         .send()
         .await
@@ -144,9 +142,9 @@ async fn json_serialization(info: Info) -> Result<Json<Vec<Entity>>, BadRequest>
 /// # Anonymization
 ///
 /// Serializing a json document
-async fn anonymization() -> Json<Vec<Entity>> {
+async fn anonymization(client: &State<Client>) -> Json<Vec<Entity>> {
     let url: String = format!("{host}/solr/performance/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:1", host=HOST);
-    let mut solr = ClientBuilder::new().build().unwrap()
+    let mut solr = client
         .get(url)
         .send()
         .await
@@ -166,7 +164,8 @@ async fn anonymization() -> Json<Vec<Entity>> {
 
 #[rocket::main]
 async fn main() {
-    rocket::build()
+    let _ = rocket::build()
+        .manage(Client::new())
         .mount(
             "/",
             openapi_get_routes![
@@ -183,5 +182,5 @@ async fn main() {
             }),
         )
         .launch()
-        .await;
+        .await.expect("Could not start rocket");
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import configparser
+import os
 from typing import List, Dict
 
 import requests
@@ -40,6 +41,11 @@ while True:
         break
     except requests.exceptions.ConnectionError:
         time.sleep(5)
+
+if os.getenv('NO_BENCHMARK') == '1':
+    while True:
+        time.sleep(86400)
+    exit(0)
 
 print('Verifying benchmarks')
 # Verify benchmarks
