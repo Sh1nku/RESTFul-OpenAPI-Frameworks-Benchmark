@@ -45,40 +45,42 @@ Each container is given 4 GB ram, and 4 CPU cores.
 * CPU: AMD Ryzen Threadripper 1950X 16-Core Processor
 * Memory: 128GB DDR4
 * Storage: M.2 Nvme SSD
-### Hello World
-|      Framework       | Language |Requests per second|Percent|
-|----------------------|----------|------------------:|------:|
-|Actix                 |Rust      |             215827|  100.0|
-|Asp.Net Core          |C#        |              86755|   40.2|
-|Oat++                 |C++       |              86166|   39.9|
-|Jooby                 |Java      |              48200|   22.3|
-|NestJS-Fastify        |Typescript|              17943|    8.3|
-|FastAPI               |Python    |               7548|    3.5|
-|Flask-Restx           |Python    |               2248|    1.0|
-|API Platform Nginx-FPM|PHP       |               1169|    0.5|
-|API Platform Apache   |PHP       |               1094|    0.5|
+# Hello World
+| Framework              | Language   |Requests per second|Percent|
+|------------------------|------------|------------------:|------:|
+| Actix                  | Rust       |             214535|  100.0|
+| Oat++                  | C++        |             107975|   50.3|
+| Asp.Net Core           | C#         |              86259|   40.2|
+| Jooby                  | Java       |              84680|   39.5|
+| Rocket                 | Rust       |              59185|   27.6|
+| NestJS-Fastify         | Typescript |              17172|    8.0|
+| Flask-Restx            | Python     |               2477|    1.2|
+| FastAPI                | Python     |               2285|    1.1|
+| API Platform Nginx-FPM | PHP        |               1172|    0.5|
+| API Platform Apache    | PHP        |               1078|    0.5|
 ### JSON Serialization
-|      Framework       | Language |Requests per second|Percent|
-|----------------------|----------|------------------:|------:|
-|Actix                 |Rust      |               2288|  100.0|
-|Asp.Net Core          |C#        |               1007|   44.0|
-|Jooby                 |Java      |                948|   41.4|
-|Oat++                 |C++       |                432|   18.9|
-|NestJS-Fastify        |Typescript|                178|    7.8|
-|Flask-Restx           |Python    |                 75|    3.3|
-|FastAPI               |Python    |                 51|    2.2|
-|API Platform Nginx-FPM|PHP       |                 33|    1.4|
-|API Platform Apache   |PHP       |                 31|    1.4|
+| Framework              | Language   |Requests per second|Percent|
+|------------------------|------------|------------------:|------:|
+| Actix                  | Rust       |               2271|  100.0|
+| Rocket                 | Rust       |               1470|   64.7|
+| Jooby                  | Java       |               1106|   48.7|
+| Asp.Net Core           | C#         |                848|   37.3|
+| Oat++                  | C++        |                423|   18.6|
+| NestJS-Fastify         | Typescript |                175|    7.7|
+| Flask-Restx            | Python     |                 72|    3.2|
+| FastAPI                | Python     |                 54|    2.4|
+| API Platform Nginx-FPM | PHP        |                 33|    1.5|
+| API Platform Apache    | PHP        |                 31|    1.4|
 ### Anonymization
-|      Framework       | Language |Requests per second|Percent|
-|----------------------|----------|------------------:|------:|
-|Actix                 |Rust      |               2219|  100.0|
-|Jooby                 |Java      |               1060|   47.8|
-|Asp.Net Core          |C#        |                945|   42.6|
-|Oat++                 |C++       |                431|   19.4|
-|NestJS-Fastify        |Typescript|                179|    8.1|
-|Flask-Restx           |Python    |                 74|    3.3|
-|FastAPI               |Python    |                 53|    2.4|
-|API Platform Nginx-FPM|PHP       |                 33|    1.5|
-|API Platform Apache   |PHP       |                 31|    1.4|
-
+| Framework              | Language   |Requests per second|Percent|
+|------------------------|------------|------------------:|------:|
+| Actix                  | Rust       |               2271|  100.0|
+| Rocket                 | Rust       |               1456|   64.1|
+| Jooby                  | Java       |               1266|   55.7|
+| Asp.Net Core           | C#         |                917|   40.4|
+| Oat++                  | C++        |                421|   18.5|
+| NestJS-Fastify         | Typescript |                177|    7.8|
+| Flask-Restx            | Python     |                 72|    3.2|
+| FastAPI                | Python     |                 52|    2.3|
+| API Platform Nginx-FPM | PHP        |                 33|    1.5|
+| API Platform Apache    | PHP        |                 31|    1.4|
