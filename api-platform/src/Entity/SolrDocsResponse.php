@@ -1,11 +1,9 @@
 <?php
 
-
 namespace App\Entity;
 
-
-class Response
+class SolrDocsResponse
 {
     /** @var Entity[] $docs */
-    public $docs;
+    public array $docs;
 }

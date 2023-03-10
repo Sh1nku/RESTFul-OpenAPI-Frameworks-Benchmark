@@ -2,86 +2,46 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\ApiProperty;
 use App\Filter\DocumentType;
+use App\State\DefaultProvider;
 
-/**
- * Class Entity
- *
- * @package App\Entity
- *
- *
- * @ApiResource(
- *      collectionOperations={
- *         "json_serialization"={
- *              "method" = "GET",
- *              "path"="/json_serialization",
- *              "filters"={
- *                  App\Filter\DocumentType::Class,
- *              },
- *              "openapi_context" = {
- *                  "summary" = "Serializing  a json document",
- *                  "tags" = {"Default"},
- *                  "responses" = {
- *                      "400" = {
- *                          "description" = "Invalid input"
- *                      }
- *                 }
- *              }
- *
- *         },
- *         "anonymization"={
- *              "method" = "GET",
- *              "path"="/anonymization",
- *              "filters"={
- *              },
- *              "openapi_context" = {
- *                  "summary" = "Serializing  a json document",
- *                  "tags" = {"Default"}
- *              }
- *         }
- *     },
- *     itemOperations={
- *         "get"={
- *             "path"="/entity/{id}",
- *             "openapi_context" = {
- *                  "tags" = {"Default"},
- *                  "summary" = "Not implemented"
- *             }
- *         },
- *
- *     },
- *     normalizationContext={
- *         "skip_null_values" = true
- *     },
- *     attributes={
- *          "pagination_enabled"=false
- *     },
- *     formats={"json"}
- * )
- */
+#[ApiResource(
+    formats: 'json',
+    normalizationContext: ['skip_null_values' => false],
+    paginationEnabled: false
+)]
+#[GetCollection(
+    uriTemplate: '/json_serialization',
+    openapiContext: [
+        'summary' => 'Serializing  a json document',
+        'tags' => ['Default']
+    ],
+    filters: [
+        DocumentType::Class,
+    ],
+    provider: DefaultProvider::class
+)]
+#[GetCollection(
+    uriTemplate: '/anonymization',
+    openapiContext: [
+        'summary' => 'Serializing  a json document',
+        'tags' => ['Default']
+    ],
+    filters: [],
+    provider: DefaultProvider::class,
+)]
 
-
-class Entity
-{
-    /**
-     * @var string $id Identifier for result
-     *
-     * @ApiProperty(identifier=true)
-     */
-    public $id;
-    /** @var int $document_type */
-    public $document_type;
-
+class Entity {
+    #[ApiProperty(identifier: true)]
+    public string $id;
+    public int $document_type;
     /** @var string[] $string_array */
     public $string_array;
-
     /** @var int[] $int_array */
     public $int_array;
-
     /** @var SubEntity[] $child_objects */
     public $child_objects;
 }
-

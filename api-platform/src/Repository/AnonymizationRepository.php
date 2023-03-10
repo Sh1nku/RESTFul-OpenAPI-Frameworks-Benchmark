@@ -6,7 +6,8 @@ use App\Entity\SolrResponse;
 
 class AnonymizationRepository extends BaseRepository
 {
-    public function getAll($filters) {
+    public function get($filters)
+    {
         $ch = curl_init(self::URL.'/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:1');
         curl_setopt($ch,CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

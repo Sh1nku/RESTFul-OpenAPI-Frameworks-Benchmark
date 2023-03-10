@@ -1,11 +1,11 @@
-FROM php:7.4-apache
+FROM php:8.2-apache
 WORKDIR /srv/api_platform
 
-RUN apt-get update && apt-get install -y libzip-dev zip libcurl4-openssl-dev
+RUN apt-get update && apt-get install -y libzip-dev zip libcurl4-openssl-dev libicu-dev
+RUN docker-php-ext-configure opcache --enable-opcache && docker-php-ext-install opcache
+RUN docker-php-ext-configure intl && docker-php-ext-install intl
 RUN docker-php-ext-install zip
 RUN docker-php-ext-install curl
-RUN docker-php-ext-configure opcache --enable-opcache \
-    && docker-php-ext-install opcache
 
 COPY ./composer.json ./composer.lock ./
 COPY ./symfony.lock ./
@@ -13,7 +13,6 @@ COPY ./bin ./bin
 COPY ./config ./config
 COPY ./public ./public
 COPY ./src ./src
-COPY ./templates ./templates
 COPY ./.env ./
 
 ENV APACHE_DOCUMENT_ROOT /srv/api_platform/public

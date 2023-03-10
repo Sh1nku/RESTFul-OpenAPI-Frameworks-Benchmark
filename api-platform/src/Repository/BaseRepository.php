@@ -1,11 +1,10 @@
 <?php
 
-
 namespace App\Repository;
 
 use Symfony\Component\Serializer\SerializerInterface;
 
-class BaseRepository
+abstract class BaseRepository
 {
     const PROTOCOL = 'http';
     const HOST = 'varnish';
@@ -21,4 +20,5 @@ class BaseRepository
         $this->serializer = $serializer;
     }
 
+    public abstract function get($filters);
 }

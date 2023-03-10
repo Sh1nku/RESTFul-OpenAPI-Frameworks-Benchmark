@@ -2,60 +2,37 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\State\DefaultProvider;
 
-/**
- * Class HelloWorldEntity
- *
- * @package App\HelloWorldEntity
- *
- *
- * @ApiResource(
- *      collectionOperations={
- *         "hello_world"={
- *              "method" = "GET",
- *              "path"="/hello_world",
- *              "openapi_context" = {
- *                  "summary" = "Returns Hello World",
- *                  "tags" = {"Default"},
- *                  "responses" = {
- *                      "200" = {
- *                          "content" = {
- *                              "text/plain" = {
- *                                 "schema" = {
- *                                     "type": "string"
- *                                 }
- *                              }
- *                          }
- *                      }
- *                  }
- *             }
- *         }
- *     },
- *     itemOperations={
- *         "get"={
- *             "path"="/hello_world_entity/{id}",
- *             "openapi_context" = {
- *                  "tags" = {"Default"},
- *                  "summary" = "Not implemented"
- *             }
- *         }
- *     },
- *     attributes={
- *          "pagination_enabled"=false
- *     },
- *     formats={"plain"}
- * )
- */
-
+#[ApiResource(
+    formats: ['plain' => ['text/plain']],
+    normalizationContext: ['skip_null_values' => false],
+    paginationEnabled: false
+)]
+#[GetCollection(
+    uriTemplate: '/hello_world',
+    openapiContext: [
+        'summary' => 'Returns Hello World',
+        'tags' => ['Default'],
+        'responses' => [
+            "200" => [
+                'content' => [
+                    'text/plain' => [
+                        'schema' => [
+                            'type' => 'string'
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ],
+    provider: DefaultProvider::class
+)]
 class HelloWorldEntity
 {
-    /**
-     * @var string $id Identifier for result
-     *
-     * @ApiProperty(identifier=true)
-     */
-    public $id;
+    #[ApiProperty(identifier: true)]
+    public string $id;
 }
