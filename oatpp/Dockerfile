@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     ninja-build \
     cmake
 
-RUN pip3 install --no-cache --upgrade pip setuptools conan
+RUN pip3 install --no-cache --upgrade pip setuptools conan==1.*
 
 COPY conanfile.txt ../
 RUN conan profile new default --detect && conan profile update settings.compiler.libcxx=libstdc++11 default
