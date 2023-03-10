@@ -2,8 +2,7 @@
 
 namespace App\Filter;
 
-use ApiPlatform\Core\Api\FilterInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Api\FilterInterface;
 
 class DocumentType implements FilterInterface
 {

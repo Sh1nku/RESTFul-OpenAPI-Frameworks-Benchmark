@@ -7,7 +7,8 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class JSONSerializationRepository extends BaseRepository
 {
-    public function getAll($filters) {
+    public function get($filters)
+    {
         if (!is_numeric($filters['document_type'])) {
             throw new BadRequestException('document_type must be an int');
         }
