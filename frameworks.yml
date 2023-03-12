@@ -1,0 +1,63 @@
+asp_net_core:
+  name: Asp.Net Core
+  language: C#
+  url: http://asp_net_core
+  color: "#5c2d91"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/asp_net_core
+  dockerfile: frameworks/AspNetCore/Dockerfile
+api_platform_nginx_fpm:
+  name: API Platform Nginx-FPM
+  language: PHP
+  url: http://api_platform_nginx_fpm
+  color: "#38a9b4"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/api_platform_nginx_fpm
+  dockerfile: frameworks/api-platform/Dockerfile-nginx-fpm
+api_platform_apache:
+  name: API Platform Apache
+  language: PHP
+  url: http://api_platform_nginx_fpm
+  color: "#38a9b4"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/api_platform_nginx_fpm
+  dockerfile: frameworks/api-platform/Dockerfile-nginx-fpm
+rust_actix:
+  name: Actix
+  language: Rust,
+  url: http://rust_actix:8080
+  color: "#000000"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/rust_actix
+  dockerfile: frameworks/rust-actix/Dockerfile
+nestjs_fastify:
+  name: NestJS-Fastify
+  language: Typescript
+  url: http://nestjs_fastify:8080
+  color: "#e0234e"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/nestjs_fastify
+  dockerfile: frameworks/nestjs-fastify/Dockerfile
+flask_restx:
+  name: Flask-Restx
+  language: Python
+  url: http://flask_restx
+  color: "#000000"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/flask_restx
+  dockerfile: frameworks/flask-restx/Dockerfile
+fastapi:
+  name: FastAPI
+  language: Python
+  url: http://fastapi
+  color: "#009385"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/fastapi
+  dockerfile: frameworks/fastapi/Dockerfile
+oatpp:
+  name: Oat++
+  language: C++
+  url: http://oatpp:8000
+  color: "#3f3d48"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/oatpp
+  dockerfile: frameworks/oatpp/Dockerfile
+jooby:
+  name: Jooby
+  language: Java
+  url: http://jooby:8080
+  color: "#f2b447"
+  image: ghcr.io/Sh1nku/RESTFul-OpenAPI-Frameworks-Benchmark/jooby
+  dockerfile: frameworks/jooby/Dockerfile

@@ -1,0 +1,17 @@
+[package]
+name = "RESTFul-OpenAPI-Frameworks-Benchmark"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+docker-api = {version = "0.13"}
+clap = {version = "4.*", features = ["derive"]}
+tokio = { version = "1.*", features = ["full"] }
+log = "0.4.17"
+env_logger = "0.10.0"
+chrono = "0.4.23"
+serde = { version = "1.*", features = ["derive"] }
+serde_yaml = "0.9"
+futures-util = "0.3.27"

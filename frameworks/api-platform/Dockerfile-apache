@@ -7,13 +7,13 @@ RUN docker-php-ext-configure intl && docker-php-ext-install intl
 RUN docker-php-ext-install zip
 RUN docker-php-ext-install curl
 
-COPY ./composer.json ./composer.lock ./
-COPY ./symfony.lock ./
-COPY ./bin ./bin
-COPY ./config ./config
-COPY ./public ./public
-COPY ./src ./src
-COPY ./.env ./
+COPY composer.json ./composer.lock ./
+COPY symfony.lock ./
+COPY bin ./bin
+COPY config ./config
+COPY public ./public
+COPY src ./src
+COPY .env ./
 
 ENV APACHE_DOCUMENT_ROOT /srv/api_platform/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf

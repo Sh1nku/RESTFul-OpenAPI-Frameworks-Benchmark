@@ -14,18 +14,18 @@ RUN sed -i 's/;*\s*pm.max_requests.*/pm.max_requests = 5000/g' /usr/local/etc/ph
 RUN cat /usr/local/etc/php-fpm.d/www.conf | grep pm
 RUN echo "access.log = /dev/null" >> /usr/local/etc/php-fpm.d/www.conf
 
-COPY ./composer.json ./composer.lock ./
-COPY ./symfony.lock ./
-COPY ./bin ./bin
-COPY ./config ./config
-COPY ./public ./public
-COPY ./src ./src
-COPY ./.env ./
+COPY composer.json ./composer.lock ./
+COPY symfony.lock ./
+COPY bin ./bin
+COPY config ./config
+COPY public ./public
+COPY src ./src
+COPY .env ./
 
 RUN curl -sSL https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer | php -- --quiet
 RUN ./composer.phar install
 
-COPY ./nginx-fpm-start.sh ./
-COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY nginx-fpm-start.sh ./
+COPY nginx.conf /etc/nginx/nginx.conf
 
 CMD ["./nginx-fpm-start.sh"]

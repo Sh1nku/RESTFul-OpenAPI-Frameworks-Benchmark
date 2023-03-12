@@ -42,7 +42,7 @@ services:
 # Frameworks
   api_platform_nginx_fpm:
     build:
-      context: api-platform/
+      context: frameworks/api-platform/
       dockerfile: Dockerfile-nginx-fpm
     ports:
       - 25902:80
@@ -52,7 +52,7 @@ services:
       driver: none
   api_platform_apache:
     build:
-      context: api-platform/
+      context: frameworks/api-platform/
       dockerfile: Dockerfile-apache
     ports:
       - 25903:80
@@ -61,20 +61,20 @@ services:
     logging:
       driver: none
   asp_net_core:
-    build: AspNetCore
+    build: frameworks/AspNetCore
     ports:
       - 25904:80
     mem_limit: 4096m
     cpus: 4.0
   rust_actix:
     container_name: rust_actix
-    build: rust-actix
+    build: frameworks/rust-actix
     ports:
       - 25905:8080
     mem_limit: 4096m
     cpus: 4.0
   flask_restx:
-    build: flask-restx
+    build: frameworks/flask-restx
     environment:
       - PYTHONUNBUFFERED=1
     ports:
@@ -88,19 +88,19 @@ services:
     mem_limit: 4096m
     cpus: 4.0
   fastapi:
-    build: fastapi
+    build: frameworks/fastapi
     ports:
       - 25908:80
     mem_limit: 4096m
     cpus: 4.0
   oatpp:
-    build: oatpp
+    build: frameworks/oatpp
     ports:
       - 25909:8000
     mem_limit: 4096m
     cpus: 4.0
   jooby:
-    build: jooby
+    build: frameworks/jooby
     ports:
       - 25910:8080
     mem_limit: 4096m
