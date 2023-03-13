@@ -14,6 +14,6 @@ pub struct Arguments {
     #[clap(long, conflicts_with = "remote")]
     pub local: bool,
     /// Forward the varnish image to the current port on host
-    #[clap(short, long)]
-    pub port: Option<u16>,
+    #[clap(short, long, default_value_t = 8983)]
+    pub port: u16,
 }
