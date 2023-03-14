@@ -157,22 +157,18 @@ struct SubEntity {
 
 async fn upload_test_data(host: &str, collection: &str) -> Result<(), Box<dyn Error>> {
     debug!("Uploading test data to Solr");
-    let mut data: Vec<Entity> = Vec::new();
     let mut rng = rand::thread_rng();
-    for i in 0..100 {
-        let id = i.to_string();
-        data.push(Entity {
-            id: id.to_string(),
-            document_type: 1,
-            int_array: (0..10).map(|_| rng.gen_range(0..10)).collect(),
-            string_array: (0..10).map(|_| hex::encode(rng.gen::<[u8; 16]>())).collect(),
-            child_objects: (0..10).map(|j| SubEntity {
-                id: format!("{id}_{j}").to_string(),
-                number: rng.gen_range(0..1000),
-                name: hex::encode(rng.gen::<[u8; 16]>())
-            }).collect()
-        });
-    }
+    let data: Vec<Entity> = (0..100).map(|i| Entity {
+        id: i.to_string(),
+        document_type: 1,
+        int_array: (0..10).map(|_| rng.gen_range(0..10)).collect(),
+        string_array: (0..10).map(|_| hex::encode(rng.gen::<[u8; 16]>())).collect(),
+        child_objects: (0..10).map(|j| SubEntity {
+            id: format!("{i}_{j}"),
+            number: rng.gen_range(0..1000),
+            name: hex::encode(rng.gen::<[u8; 16]>())
+        }).collect()
+    }).collect();
     let client = reqwest::Client::new();
     let request = client.get(format!("{host}/solr/{collection}/update?commit=true&overwrite=true&wt=json")).json(&data);
     let solr_response = request.send().await?.json::<SolrResponse>().await?;
