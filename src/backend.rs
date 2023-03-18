@@ -1,7 +1,9 @@
+use std::path::Path;
 use docker_api::{Container, Docker, Network};
-use docker_api::opts::{ContainerConnectionOpts, ContainerCreateOpts, ContainerRemoveOpts, ContainerStopOpts, NetworkCreateOpts, PublishPort, PullOpts};
+use docker_api::opts::{ContainerConnectionOpts, ContainerCreateOpts, ContainerRemoveOpts, ContainerStopOpts, ImageBuildOpts, NetworkCreateOpts, PublishPort, PullOpts};
 use log::{debug};
 use futures_util::stream::{StreamExt};
+use crate::framework_config::FrameworkConfig;
 
 const NETWORK_NAME: &str = "restful_api_network";
 const SOLR_CONTAINER_NAME: &str = "restful_api_solr";
@@ -28,14 +30,14 @@ pub async fn reset_containers(docker: &Docker, network_name: &str) -> Result<(),
 }
 
 async fn reset_container(docker: &Docker, name: &str) {
-    debug!("Stopping previous {name} container");
+    debug!("Stopping {name} container");
     match docker.containers().get(name).stop(&ContainerStopOpts::builder().build()).await {
-        Ok(_) => {debug!("Stopped previous {name} container")}
+        Ok(_) => {debug!("Stopped {name} container")}
         Err(e) => {debug!("{:?}", e)}
     };
-    debug!("Deleting previous {name} container");
+    debug!("Deleting {name} container");
     match docker.containers().get(name).remove(&ContainerRemoveOpts::builder().volumes(true).build()).await {
-        Ok(_) => {debug!("Deleted previous {name} container")}
+        Ok(_) => {debug!("Deleted {name} container")}
         Err(e) => {debug!("{:?}", e)}
     };
 }
@@ -72,8 +74,25 @@ async fn create_container(docker: &Docker, network: &Network, container_name: &s
     Ok(container)
 }
 
+async fn build_image(docker: &Docker, path: &Path, tag: &str) -> Result<(), docker_api::errors::Error> {
+    debug!("Building {tag} container");
+    let images = docker.images();
+    let directory = path.parent().unwrap();
+    let file = path.file_name().unwrap();
+    let mut stream = images.build(&ImageBuildOpts::builder(directory).dockerfile(file.to_str().unwrap()).tag(tag).build());
+    while let Some(build_result) = stream.next().await {
+        match build_result {
+            Ok(output) => {
+                debug!("{:?}", output);
+            },
+            Err(e) => return Err(e),
+        }
+    }
+    Ok(())
+}
 
-pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<(), docker_api::errors::Error> {
+
+pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<Network, docker_api::errors::Error> {
     let current_dir = std::env::current_dir().unwrap().to_str().unwrap().to_string();
     reset_containers(docker, NETWORK_NAME).await?;
     let network = create_network(docker, NETWORK_NAME).await?;
@@ -97,5 +116,35 @@ pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<(), docker
                          .env(["ZK_HOST=zookeeper", "SOLR_JAVA_MEM=-Xms1g -Xmx1g"])
                          .build()
     ).await?;
-    Ok(())
+    Ok(network)
+}
+
+pub enum ImageType {
+    Local,
+    Remote(String)
+}
+
+pub async fn start_benchmark_container(docker: &Docker, network: &Network, container_name: &str, config: &FrameworkConfig, image_type: ImageType) -> Result<u16, docker_api::errors::Error> {
+    reset_container(docker, container_name).await;
+    let (image_name, tag) = match image_type {
+        ImageType::Local => {
+            build_image(docker, Path::new(config.dockerfile.as_str()), container_name).await?;
+            (container_name.to_string(), "latest".to_string())
+        }
+        ImageType::Remote(tag) => {
+            (container_name.to_string(), tag)
+        }
+    };
+
+    create_container(docker,
+                     network,
+                     container_name,
+                     image_name.as_str(),
+                     tag.as_str(),
+                     &ContainerCreateOpts::builder().
+                         image(format!("{image_name}:{tag}"))
+                         .expose(PublishPort::tcp(8984), config.port as u32)
+                         .build()).await?;
+    Ok(8984)
+
 }

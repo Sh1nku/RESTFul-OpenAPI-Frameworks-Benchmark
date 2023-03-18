@@ -6,12 +6,13 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct FrameworkConfig {
-    name: String,
-    language: String,
-    url: String,
-    image: String,
-    dockerfile: String,
-    color: String
+    pub name: String,
+    pub language: String,
+    pub url: String,
+    pub image: String,
+    pub port: u16,
+    pub dockerfile: String,
+    pub color: String
 }
 
 pub fn get_framework_configs() -> Result<HashMap<String, FrameworkConfig>, Box<dyn error::Error>> {
