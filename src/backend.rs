@@ -3,6 +3,7 @@ use docker_api::{Container, Docker, Network};
 use docker_api::opts::{ContainerConnectionOpts, ContainerCreateOpts, ContainerRemoveOpts, ContainerStopOpts, ImageBuildOpts, NetworkCreateOpts, PublishPort, PullOpts};
 use log::{debug};
 use futures_util::stream::{StreamExt};
+use serde::{Deserialize, Serialize};
 use crate::framework_config::FrameworkConfig;
 
 const NETWORK_NAME: &str = "restful_api_network";
@@ -64,9 +65,11 @@ async fn create_network(docker: &Docker, name: &str) -> Result<Network, docker_a
     docker.networks().create(&NetworkCreateOpts::builder(name).build()).await
 }
 
-async fn create_container(docker: &Docker, network: &Network, container_name: &str, image_name: &str, image_tag: &str, opts: &ContainerCreateOpts) -> Result<Container, docker_api::errors::Error> {
+async fn create_container(docker: &Docker, network: &Network, container_name: &str, image_name: &str, image_type: ImageType, opts: &ContainerCreateOpts) -> Result<Container, docker_api::errors::Error> {
     reset_container(docker, container_name).await;
-    pull_image(docker, image_name, image_tag).await?;
+    if let ImageType::Remote(_) = image_type {
+        pull_image(docker, image_name, image_type.get_tag().as_str()).await?;
+    }
     debug!("Creating {container_name} container");
     let container = docker.containers().create(opts).await?;
     network.connect(&ContainerConnectionOpts::builder(container_name).build()).await?;
@@ -96,7 +99,7 @@ pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<Network, d
     let current_dir = std::env::current_dir().unwrap().to_str().unwrap().to_string();
     reset_containers(docker, NETWORK_NAME).await?;
     let network = create_network(docker, NETWORK_NAME).await?;
-    create_container(docker, &network, ZOOKEEPER_CONTAINER_NAME, ZOOKEEPER_IMAGE_NAME, ZOOKEEPER_IMAGE_TAG,
+    create_container(docker, &network, ZOOKEEPER_CONTAINER_NAME, ZOOKEEPER_IMAGE_NAME, ImageType::Remote(ZOOKEEPER_IMAGE_TAG.to_string()),
                      &ContainerCreateOpts::builder()
                          .image(format!("{ZOOKEEPER_IMAGE_NAME}:{ZOOKEEPER_IMAGE_TAG}"))
                          .hostname("zookeeper")
@@ -105,7 +108,7 @@ pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<Network, d
                          .command(["/start_zk.sh"])
                          .env(["ZOO_MY_ID=1", "ZOO_PORT=2181","ZOO_SERVERS=server.1=zookeeper:2888:3888"])
                          .build()).await?;
-    create_container(docker, &network, SOLR_CONTAINER_NAME, SOLR_IMAGE_NAME, SOLR_IMAGE_TAG,
+    create_container(docker, &network, SOLR_CONTAINER_NAME, SOLR_IMAGE_NAME, ImageType::Remote(SOLR_IMAGE_TAG.to_string()),
                      &ContainerCreateOpts::builder()
                          .image(format!("{SOLR_IMAGE_NAME}:{SOLR_IMAGE_TAG}"))
                          .hostname("solr")
@@ -119,32 +122,38 @@ pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<Network, d
     Ok(network)
 }
 
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum ImageType {
     Local,
     Remote(String)
 }
 
+impl ImageType {
+    pub fn get_tag(&self) -> String {
+        match self {
+            ImageType::Local => "latest".to_string(),
+            ImageType::Remote(tag) => tag.to_string()
+        }
+    }
+
+}
+
 pub async fn start_benchmark_container(docker: &Docker, network: &Network, container_name: &str, config: &FrameworkConfig, image_type: ImageType) -> Result<u16, docker_api::errors::Error> {
     reset_container(docker, container_name).await;
-    let (image_name, tag) = match image_type {
-        ImageType::Local => {
-            build_image(docker, Path::new(config.dockerfile.as_str()), container_name).await?;
-            (container_name.to_string(), "latest".to_string())
-        }
-        ImageType::Remote(tag) => {
-            (container_name.to_string(), tag)
-        }
-    };
+    if image_type == ImageType::Local {
+        build_image(docker, Path::new(config.dockerfile.as_str()), container_name).await?;
+    }
+    let image_tag = image_type.get_tag();
 
     create_container(docker,
                      network,
                      container_name,
-                     image_name.as_str(),
-                     tag.as_str(),
+                     container_name,
+                     image_type,
                      &ContainerCreateOpts::builder().
-                         image(format!("{image_name}:{tag}"))
-                         .expose(PublishPort::tcp(8984), config.port as u32)
+                         image(format!("{container_name}:{image_tag}"))
+                         .hostname(container_name)
+                         .name(container_name)
                          .build()).await?;
     Ok(8984)
-
 }

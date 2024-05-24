@@ -7,7 +7,7 @@ use std::io::Write;
 use crate::framework_config::get_framework_configs;
 use clap::Parser;
 use crate::backend::{ImageType, start_backend, start_benchmark_container};
-use crate::solr::upload_data_to_solr;
+use crate::solr::{create_solr_client, upload_data_to_solr};
 
 pub mod argparse;
 pub mod framework_config;
@@ -34,6 +34,7 @@ async fn main() {
     //TODO Dynamically determine Docker version?
     let docker = Docker::unix_versioned("/var/run/docker.sock", ApiVersion::new(1, Some(41), Some(0)));
     let network = start_backend(&docker, args.port).await.unwrap();
+    let solr_client = create_solr_client("http://127.0.0.1:8983");
     //upload_data_to_solr("http://127.0.0.1:8983").await.unwrap();
     for config in configs {
         let port = start_benchmark_container(&docker, &network, config.0.as_str(), &config.1, ImageType::Local).await.unwrap();
