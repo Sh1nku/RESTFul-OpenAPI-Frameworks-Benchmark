@@ -14,14 +14,14 @@ api_platform_nginx_fpm:
   color: "#38a9b4"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/api_platform_nginx_fpm
   dockerfile: frameworks/api-platform/Dockerfile-nginx-fpm
-#api_platform_apache:
-#  name: API Platform Apache
-#  language: PHP
-#  url: http://api_platform_apache
-#  port: 80
-#  color: "#38a9b4"
-#  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/api_platform_apache
-#  dockerfile: frameworks/api-platform/Dockerfile-apache
+api_platform_apache:
+  name: API Platform Apache
+  language: PHP
+  url: http://api_platform_apache
+  port: 80
+  color: "#38a9b4"
+  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/api_platform_apache
+  dockerfile: frameworks/api-platform/Dockerfile-apache
 rust_actix:
   name: Actix
   language: Rust,

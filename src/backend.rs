@@ -1,12 +1,12 @@
 use std::path::Path;
 use docker_api::{Container, Docker, Network};
-use docker_api::opts::{ContainerConnectionOpts, ContainerCreateOpts, ContainerRemoveOpts, ContainerStopOpts, ImageBuildOpts, NetworkCreateOpts, PublishPort, PullOpts};
+use docker_api::opts::{ContainerConnectionOpts, ContainerCreateOpts, ContainerRemoveOpts, ContainerStopOpts, ImageBuildOpts, NetworkCreateOpts, NetworkListOptsBuilder, PublishPort, PullOpts};
 use log::{debug};
 use futures_util::stream::{StreamExt};
 use serde::{Deserialize, Serialize};
 use crate::framework_config::FrameworkConfig;
 
-const NETWORK_NAME: &str = "restful_api_network";
+pub const NETWORK_NAME: &str = "restful_api_network";
 const SOLR_CONTAINER_NAME: &str = "restful_api_solr";
 const SOLR_IMAGE_NAME: &str = "solr";
 const SOLR_IMAGE_TAG: &str = "8.11.2";
@@ -15,7 +15,25 @@ const ZOOKEEPER_CONTAINER_NAME: &str = "restful_api_zookeeper";
 const ZOOKEEPER_IMAGE_NAME: &str = "zookeeper";
 const ZOOKEEPER_IMAGE_TAG: &str = "3.4";
 
+const VARNISH_CONTAINER_NAME: &str = "restful_api_varnish";
+const VARNISH_IMAGE_NAME: &str = "varnish";
+const VARNISH_IMAGE_TAG: &str = "6.0";
+
+const SPEEDBUMP_IMAGE_NAME: &str = "kffl/speedbump";
+const SPEEDBUMP_IMAGE_TAG: &str = "v1.1.0";
+
+const SPEEDBUMP_FAST_CONTAINER_NAME: &str = "restful_api_speedbump_fast";
+const SPEEDBUMP_FAST_COMMAND: &str = "--latency 20ms --port 8984 varnish:8983";
+
+const SPEEDBUMP_SLOW_CONTAINER_NAME: &str = "restful_api_speedbump_slow";
+const SPEEDBUMP_SLOW_COMMAND: &str = "--latency 200ms --port 8984 varnish:8983";
+
 pub async fn reset_containers(docker: &Docker, network_name: &str) -> Result<(), docker_api::errors::Error> {
+    let networks = docker.networks().list(&NetworkListOptsBuilder::default().build()).await?;
+    let network = networks.iter().find(|n| n.name == Some(network_name.to_string()));
+    if network.is_none() {
+        return Ok(());
+    }
     let network = docker.networks().get(network_name).inspect().await?;
     match network.containers {
         None => {}
@@ -114,9 +132,32 @@ pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<Network, d
                          .hostname("solr")
                          .name(SOLR_CONTAINER_NAME)
                          .volumes([format!("{current_dir}/benchmark_server/start_solr.sh:/start_solr.sh")])
-                         .expose(PublishPort::tcp(8983), host_port as u32)
                          .command(["/start_solr.sh"])
                          .env(["ZK_HOST=zookeeper", "SOLR_JAVA_MEM=-Xms1g -Xmx1g"])
+                         .build()
+    ).await?;
+    create_container(docker, &network, VARNISH_CONTAINER_NAME, VARNISH_IMAGE_NAME, ImageType::Remote(VARNISH_IMAGE_TAG.to_string()),
+                     &ContainerCreateOpts::builder()
+                         .image(format!("{VARNISH_IMAGE_NAME}:{VARNISH_IMAGE_TAG}"))
+                         .hostname("varnish")
+                         .name(VARNISH_CONTAINER_NAME)
+                         .volumes([format!("{current_dir}/benchmark_server/varnish.vcl:/etc/varnish/default.vcl")])
+                         .build()
+    ).await?;
+    create_container(docker, &network, SPEEDBUMP_FAST_CONTAINER_NAME, SPEEDBUMP_IMAGE_NAME, ImageType::Remote(SPEEDBUMP_IMAGE_TAG.to_string()),
+                     &ContainerCreateOpts::builder()
+                         .image(format!("{SPEEDBUMP_IMAGE_NAME}:{SPEEDBUMP_IMAGE_TAG}"))
+                         .hostname("speedbump_fast")
+                         .name(SPEEDBUMP_FAST_CONTAINER_NAME)
+                         .command(SPEEDBUMP_FAST_COMMAND.split(" ").collect::<Vec<&str>>().as_slice())
+                         .build()
+    ).await?;
+    create_container(docker, &network, SPEEDBUMP_SLOW_CONTAINER_NAME, SPEEDBUMP_IMAGE_NAME, ImageType::Remote(SPEEDBUMP_IMAGE_TAG.to_string()),
+                     &ContainerCreateOpts::builder()
+                         .image(format!("{SPEEDBUMP_IMAGE_NAME}:{SPEEDBUMP_IMAGE_TAG}"))
+                         .hostname("speedbump_slow")
+                         .name(SPEEDBUMP_SLOW_CONTAINER_NAME)
+                         .command(SPEEDBUMP_SLOW_COMMAND.split(" ").collect::<Vec<&str>>().as_slice())
                          .build()
     ).await?;
     Ok(network)
@@ -138,14 +179,14 @@ impl ImageType {
 
 }
 
-pub async fn start_benchmark_container(docker: &Docker, network: &Network, container_name: &str, config: &FrameworkConfig, image_type: ImageType) -> Result<u16, docker_api::errors::Error> {
+pub async fn start_benchmark_container(docker: &Docker, network: &Network, container_name: &str, config: &FrameworkConfig, image_type: ImageType) -> Result<Container, docker_api::errors::Error> {
     reset_container(docker, container_name).await;
     if image_type == ImageType::Local {
         build_image(docker, Path::new(config.dockerfile.as_str()), container_name).await?;
     }
     let image_tag = image_type.get_tag();
 
-    create_container(docker,
+    Ok(create_container(docker,
                      network,
                      container_name,
                      container_name,
@@ -154,6 +195,5 @@ pub async fn start_benchmark_container(docker: &Docker, network: &Network, conta
                          image(format!("{container_name}:{image_tag}"))
                          .hostname(container_name)
                          .name(container_name)
-                         .build()).await?;
-    Ok(8984)
+                         .build()).await?)
 }
