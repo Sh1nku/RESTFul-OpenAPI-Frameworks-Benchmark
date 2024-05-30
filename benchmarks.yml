@@ -1,0 +1,17 @@
+setups:
+  - name: direct
+    hostname: varnish
+    port: 80
+  - name: 20 ms delay
+    hostname: speedbump_fast
+    port: 80
+  - name: 200 ms delay
+    hostname: speedbump_slow
+    port: 80
+benchmarks:
+  - name: Hello World
+    path: /hello_world
+  - name: Json Serialization
+    path: /json_serialization?document_type=1
+  - name: Anonymization
+    path: /anonymization

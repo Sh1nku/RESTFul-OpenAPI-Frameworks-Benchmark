@@ -113,7 +113,7 @@ async fn build_image(docker: &Docker, path: &Path, tag: &str) -> Result<(), dock
 }
 
 
-pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<Network, docker_api::errors::Error> {
+pub async fn start_backend(docker: &Docker) -> Result<Network, docker_api::errors::Error> {
     let current_dir = std::env::current_dir().unwrap().to_str().unwrap().to_string();
     reset_containers(docker, NETWORK_NAME).await?;
     let network = create_network(docker, NETWORK_NAME).await?;
@@ -132,6 +132,7 @@ pub async fn start_backend(docker: &Docker, host_port: u16) -> Result<Network, d
                          .hostname("solr")
                          .name(SOLR_CONTAINER_NAME)
                          .volumes([format!("{current_dir}/benchmark_server/start_solr.sh:/start_solr.sh")])
+                         .expose(PublishPort::tcp(8983), 8983)
                          .command(["/start_solr.sh"])
                          .env(["ZK_HOST=zookeeper", "SOLR_JAVA_MEM=-Xms1g -Xmx1g"])
                          .build()

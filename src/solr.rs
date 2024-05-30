@@ -1,12 +1,8 @@
 use std::error::Error;
-use std::fs::{File};
-use std::io::{Read, Seek, Write};
 use std::path::Path;
 use chrono::Duration;
 use log::debug;
 use serde::{Serialize, Deserialize};
-use walkdir::{DirEntry, WalkDir};
-use tempfile::tempfile;
 use tokio::time::sleep;
 use rand::Rng;
 use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
