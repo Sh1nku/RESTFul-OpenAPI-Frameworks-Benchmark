@@ -2,10 +2,11 @@ use crate::argparse::{Arguments};
 use docker_api::{ApiVersion, Docker};
 use env_logger::Builder;
 use chrono::Local;
-use log::{LevelFilter};
+use log::{info, LevelFilter};
 use std::io::Write;
 use crate::framework_config::get_framework_configs;
 use clap::Parser;
+use tokio::signal;
 use crate::backend::{ImageType, NETWORK_NAME, reset_containers, start_backend, start_benchmark_container};
 use crate::benchmark_config::get_benchmark_configs;
 use crate::solr::{create_solr_client, upload_data_to_solr};
@@ -36,12 +37,19 @@ async fn main() {
     let benchmark_configs = get_benchmark_configs().unwrap();
     //TODO Dynamically determine Docker version?
     let docker = Docker::unix_versioned("/var/run/docker.sock", ApiVersion::new(1, Some(41), Some(0)));
-    let network = start_backend(&docker).await.unwrap();
-    let solr_client = create_solr_client("http://127.0.0.1:8983");
+    let network = start_backend(&docker, &args).await.unwrap();
+    let solr_client = create_solr_client(format!("http://127.0.0.1:{}", args.port).as_str());
     upload_data_to_solr(&solr_client).await.unwrap();
 
-    for config in framework_configs {
-        let container = start_benchmark_container(&docker, &network, config.0.as_str(), &config.1, ImageType::Local).await.unwrap();
+    if args.development {
+        info!("In development mode. Press Ctrl-C to exit.");
+        signal::ctrl_c().await.unwrap();
+        info!("Received Ctrl-C. Stopping containers and exiting")
+    }
+    else {
+        for config in framework_configs {
+            let container = start_benchmark_container(&docker, &network, config.0.as_str(), &config.1, ImageType::Local).await.unwrap();
+        }
     }
     reset_containers(&docker, NETWORK_NAME).await.unwrap();
     

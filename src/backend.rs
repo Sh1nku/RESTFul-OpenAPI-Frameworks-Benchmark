@@ -4,6 +4,7 @@ use docker_api::opts::{ContainerConnectionOpts, ContainerCreateOpts, ContainerRe
 use log::{debug};
 use futures_util::stream::{StreamExt};
 use serde::{Deserialize, Serialize};
+use crate::argparse::Arguments;
 use crate::framework_config::FrameworkConfig;
 
 pub const NETWORK_NAME: &str = "restful_api_network";
@@ -113,7 +114,7 @@ async fn build_image(docker: &Docker, path: &Path, tag: &str) -> Result<(), dock
 }
 
 
-pub async fn start_backend(docker: &Docker) -> Result<Network, docker_api::errors::Error> {
+pub async fn start_backend(docker: &Docker, arguments: &Arguments) -> Result<Network, docker_api::errors::Error> {
     let current_dir = std::env::current_dir().unwrap().to_str().unwrap().to_string();
     reset_containers(docker, NETWORK_NAME).await?;
     let network = create_network(docker, NETWORK_NAME).await?;
@@ -132,35 +133,37 @@ pub async fn start_backend(docker: &Docker) -> Result<Network, docker_api::error
                          .hostname("solr")
                          .name(SOLR_CONTAINER_NAME)
                          .volumes([format!("{current_dir}/benchmark_server/start_solr.sh:/start_solr.sh")])
-                         .expose(PublishPort::tcp(8983), 8983)
+                         .memory(1_000_000_000)
                          .command(["/start_solr.sh"])
-                         .env(["ZK_HOST=zookeeper", "SOLR_JAVA_MEM=-Xms1g -Xmx1g"])
+                         .env(["ZK_HOST=zookeeper", "SOLR_JAVA_MEM=-Xms512m -Xmx512m"])
                          .build()
     ).await?;
     create_container(docker, &network, VARNISH_CONTAINER_NAME, VARNISH_IMAGE_NAME, ImageType::Remote(VARNISH_IMAGE_TAG.to_string()),
-                     &ContainerCreateOpts::builder()
-                         .image(format!("{VARNISH_IMAGE_NAME}:{VARNISH_IMAGE_TAG}"))
-                         .hostname("varnish")
-                         .name(VARNISH_CONTAINER_NAME)
-                         .volumes([format!("{current_dir}/benchmark_server/varnish.vcl:/etc/varnish/default.vcl")])
-                         .build()
+                        &ContainerCreateOpts::builder()
+                            .image(format!("{VARNISH_IMAGE_NAME}:{VARNISH_IMAGE_TAG}"))
+                            .hostname("varnish")
+                            .name(VARNISH_CONTAINER_NAME)
+                            .expose(PublishPort::tcp(80), arguments.port as u32)
+                            .volumes([format!("{current_dir}/benchmark_server/varnish.vcl:/etc/varnish/default.vcl")]).build()
     ).await?;
-    create_container(docker, &network, SPEEDBUMP_FAST_CONTAINER_NAME, SPEEDBUMP_IMAGE_NAME, ImageType::Remote(SPEEDBUMP_IMAGE_TAG.to_string()),
-                     &ContainerCreateOpts::builder()
-                         .image(format!("{SPEEDBUMP_IMAGE_NAME}:{SPEEDBUMP_IMAGE_TAG}"))
-                         .hostname("speedbump_fast")
-                         .name(SPEEDBUMP_FAST_CONTAINER_NAME)
-                         .command(SPEEDBUMP_FAST_COMMAND.split(" ").collect::<Vec<&str>>().as_slice())
-                         .build()
-    ).await?;
-    create_container(docker, &network, SPEEDBUMP_SLOW_CONTAINER_NAME, SPEEDBUMP_IMAGE_NAME, ImageType::Remote(SPEEDBUMP_IMAGE_TAG.to_string()),
-                     &ContainerCreateOpts::builder()
-                         .image(format!("{SPEEDBUMP_IMAGE_NAME}:{SPEEDBUMP_IMAGE_TAG}"))
-                         .hostname("speedbump_slow")
-                         .name(SPEEDBUMP_SLOW_CONTAINER_NAME)
-                         .command(SPEEDBUMP_SLOW_COMMAND.split(" ").collect::<Vec<&str>>().as_slice())
-                         .build()
-    ).await?;
+    if !arguments.development {
+        create_container(docker, &network, SPEEDBUMP_FAST_CONTAINER_NAME, SPEEDBUMP_IMAGE_NAME, ImageType::Remote(SPEEDBUMP_IMAGE_TAG.to_string()),
+                         &ContainerCreateOpts::builder()
+                             .image(format!("{SPEEDBUMP_IMAGE_NAME}:{SPEEDBUMP_IMAGE_TAG}"))
+                             .hostname("speedbump_fast")
+                             .name(SPEEDBUMP_FAST_CONTAINER_NAME)
+                             .command(SPEEDBUMP_FAST_COMMAND.split(" ").collect::<Vec<&str>>().as_slice())
+                             .build()
+        ).await?;
+        create_container(docker, &network, SPEEDBUMP_SLOW_CONTAINER_NAME, SPEEDBUMP_IMAGE_NAME, ImageType::Remote(SPEEDBUMP_IMAGE_TAG.to_string()),
+                         &ContainerCreateOpts::builder()
+                             .image(format!("{SPEEDBUMP_IMAGE_NAME}:{SPEEDBUMP_IMAGE_TAG}"))
+                             .hostname("speedbump_slow")
+                             .name(SPEEDBUMP_SLOW_CONTAINER_NAME)
+                             .command(SPEEDBUMP_SLOW_COMMAND.split(" ").collect::<Vec<&str>>().as_slice())
+                             .build()
+        ).await?;
+    }
     Ok(network)
 }
 

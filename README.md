@@ -81,3 +81,8 @@ Each container is given 4 GB ram, and 4 CPU cores.
 |API Platform Nginx-FPM|PHP       |                 33|    1.5|
 |API Platform Apache   |PHP       |                 31|    1.4|
 
+## Development
+```bash
+cargo run -- --development --port 8983
+```
+
