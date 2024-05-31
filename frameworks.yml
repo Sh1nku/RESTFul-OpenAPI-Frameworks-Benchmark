@@ -7,29 +7,22 @@ asp_net_core:
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/asp_net_core
   dockerfile: frameworks/AspNetCore/Dockerfile
 api_platform_nginx_fpm:
-  name: API Platform Nginx-FPM
+  name: API Platform
   language: PHP
   url: http://api_platform_nginx_fpm
   port: 80
   color: "#38a9b4"
-  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/api_platform_nginx_fpm
-  dockerfile: frameworks/api-platform/Dockerfile-nginx-fpm
-api_platform_apache:
-  name: API Platform Apache
-  language: PHP
-  url: http://api_platform_apache
-  port: 80
-  color: "#38a9b4"
-  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/api_platform_apache
-  dockerfile: frameworks/api-platform/Dockerfile-apache
+  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/api_platform
+  dockerfile: frameworks/api-platform/Dockerfile
 rust_actix:
   name: Actix
   language: Rust,
-  url: http://rust_actix
+  url: http://actix
   port: 8080
   color: "#000000"
-  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/rust_actix
-  dockerfile: frameworks/rust-actix/Dockerfile
+  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/actix
+  dockerfile: frameworks/actix/Dockerfile
+  openapi_file: /openapi.json
 nestjs_fastify:
   name: NestJS-Fastify
   language: Typescript

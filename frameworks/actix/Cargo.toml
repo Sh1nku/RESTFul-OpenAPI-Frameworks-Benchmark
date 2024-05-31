@@ -4,10 +4,12 @@ version = "0.0.1"
 edition = "2018"
 
 [dependencies]
-actix-web = "3.0"
-paperclip = { version = "0.6", features = ["actix", "swagger-ui"] }
+actix-web = "4.6.0"
+utoipa = { version = "4.2.3", features = ["actix_extras"]}
+utoipa-swagger-ui = { version = "7.1.0", features = ["actix-web"]}
 serde = "1.0"
 serde_json = "1.0"
+awc = "3.5.0"
 
 [profile.dev]
 opt-level = 0
