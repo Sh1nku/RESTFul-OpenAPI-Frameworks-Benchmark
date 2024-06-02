@@ -6,7 +6,7 @@ asp_net_core:
   color: "#5c2d91"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/asp_net_core
   dockerfile: frameworks/AspNetCore/Dockerfile
-api_platform_nginx_fpm:
+api_platform:
   name: API Platform
   language: PHP
   url: http://api_platform_nginx_fpm
@@ -14,7 +14,7 @@ api_platform_nginx_fpm:
   color: "#38a9b4"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/api_platform
   dockerfile: frameworks/api-platform/Dockerfile
-rust_actix:
+actix:
   name: Actix
   language: Rust,
   url: http://actix
