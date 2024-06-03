@@ -1,4 +1,4 @@
-setups:
+backends:
   - name: direct
     hostname: varnish
     port: 80
@@ -15,3 +15,16 @@ benchmarks:
     path: /json_serialization?document_type=1
   - name: Anonymization
     path: /anonymization
+setups:
+  - name: 20 connections 60 seconds
+    connections: 20
+    duration: 60
+  - name: 100 connections 60 seconds
+    connections: 100
+    duration: 60
+  - name: 500 connections 60 seconds
+    connections: 500
+    duration: 60
+  - name: 2000 connections 60 seconds
+    connections: 2000
+    duration: 60

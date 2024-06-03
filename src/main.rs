@@ -2,6 +2,7 @@ use crate::argparse::Arguments;
 use crate::backend::{
     reset_containers, start_backend, start_benchmark_container, ImageType, NETWORK_NAME,
 };
+use crate::benchmark::OhaExecutable;
 use crate::benchmark_config::get_benchmark_configs;
 use crate::framework_config::get_framework_configs;
 use crate::solr::{create_solr_client, upload_data_to_solr};
@@ -15,6 +16,7 @@ use tokio::signal;
 
 pub mod argparse;
 pub mod backend;
+pub mod benchmark;
 pub mod benchmark_config;
 pub mod framework_config;
 pub mod solr;
@@ -59,6 +61,7 @@ async fn main() {
         signal::ctrl_c().await.unwrap();
         info!("Received Ctrl-C. Stopping containers and exiting")
     } else {
+        let oha_executable = OhaExecutable::new().await;
         for config in framework_configs
             .iter()
             .filter(|(k, _v)| args.frameworks.contains(k) || args.frameworks.is_empty())

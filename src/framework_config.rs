@@ -10,7 +10,6 @@ pub struct FrameworkConfig {
     pub language: String,
     pub url: String,
     pub image: String,
-    pub port: u16,
     pub dockerfile: String,
     pub color: String,
 }

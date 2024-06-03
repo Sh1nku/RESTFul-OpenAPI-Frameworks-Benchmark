@@ -1,7 +1,7 @@
+use serde::{Deserialize, Serialize};
 use std::error;
 use std::fs::read_to_string;
 use std::path::Path;
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Benchmark {
@@ -10,18 +10,26 @@ pub struct Benchmark {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct Setup {
+pub struct Backend {
     pub name: String,
     pub hostname: String,
     pub port: u16,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
+pub struct Setup {
+    pub connections: u32,
+    pub duration: u32,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct BenchmarkConfig {
     pub benchmarks: Vec<Benchmark>,
-    pub setups: Vec<Setup>
+    pub backends: Vec<Backend>,
 }
 
 pub fn get_benchmark_configs() -> Result<BenchmarkConfig, Box<dyn error::Error>> {
-    Ok(serde_yaml::from_str(&read_to_string(Path::new("benchmarks.yml"))?)?)
+    Ok(serde_yaml::from_str(&read_to_string(Path::new(
+        "benchmarks.yml",
+    ))?)?)
 }

@@ -2,23 +2,20 @@ asp_net_core:
   name: Asp.Net Core
   language: C#
   url: http://asp_net_core
-  port: 80
   color: "#5c2d91"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/asp_net_core
   dockerfile: frameworks/AspNetCore/Dockerfile
 api_platform:
   name: API Platform
   language: PHP
-  url: http://api_platform_nginx_fpm
-  port: 80
+  url: http://api_platform
   color: "#38a9b4"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/api_platform
   dockerfile: frameworks/api-platform/Dockerfile
 actix:
   name: Actix
   language: Rust,
-  url: http://actix
-  port: 8080
+  url: http://actix:8080
   color: "#000000"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/actix
   dockerfile: frameworks/actix/Dockerfile
@@ -27,7 +24,6 @@ nestjs_fastify:
   name: NestJS-Fastify
   language: Typescript
   url: http://nestjs_fastify:8080
-  port: 8080
   color: "#e0234e"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/nestjs_fastify
   dockerfile: frameworks/nestjs-fastify/Dockerfile
@@ -35,31 +31,34 @@ flask_restx:
   name: Flask-Restx
   language: Python
   url: http://flask_restx
-  port: 80
   color: "#000000"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/flask_restx
   dockerfile: frameworks/flask-restx/Dockerfile
-fastapi:
-  name: FastAPI
+fastapi_v1:
+  name: FastAPI (Pydantic v1)
   language: Python
-  url: http://fastapi
-  port: 80
+  url: http://fastapi_v1
   color: "#009385"
-  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/fastapi
-  dockerfile: frameworks/fastapi/Dockerfile
+  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/fastapi_v1
+  dockerfile: frameworks/fastapi_v1/Dockerfile
+fastapi_v2:
+  name: FastAPI (Pydantic v2)
+  language: Python
+  url: http://fastapi_v2
+  color: "#009385"
+  image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/fastapi_v2
+  dockerfile: frameworks/fastapi_v2/Dockerfile
 oatpp:
   name: Oat++
   language: C++
-  url: http://oatpp
-  port: 8000
+  url: http://oatpp:8080
   color: "#3f3d48"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/oatpp
   dockerfile: frameworks/oatpp/Dockerfile
 jooby:
   name: Jooby
   language: Java
-  url: http://jooby
-  port: 8080
+  url: http://jooby:8080
   color: "#f2b447"
   image: ghcr.io/sh1nku/restful-openapi-frameworks-benchmark/jooby
   dockerfile: frameworks/jooby/Dockerfile
