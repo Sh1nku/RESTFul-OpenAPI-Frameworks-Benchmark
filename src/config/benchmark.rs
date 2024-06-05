@@ -13,8 +13,7 @@ pub struct Benchmark {
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub struct Backend {
     pub name: String,
-    pub hostname: String,
-    pub port: u16,
+    pub url: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Copy)]

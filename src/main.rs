@@ -4,14 +4,16 @@ use docker_api::{ApiVersion, Docker};
 use env_logger::Builder;
 use log::{info, LevelFilter};
 use restful_openapi_frameworks_benchmark::backend::{
-    reset_containers, start_backend, start_benchmark_container, ImageType, NETWORK_NAME,
+    build_image, reset_containers, start_backend, start_benchmark_container, ImageType,
+    NETWORK_NAME, OHA_CONTAINER_NAME,
 };
-use restful_openapi_frameworks_benchmark::benchmark::OhaExecutable;
+use restful_openapi_frameworks_benchmark::benchmark::run_benchmark;
 use restful_openapi_frameworks_benchmark::config::argparse::Arguments;
 use restful_openapi_frameworks_benchmark::config::benchmark::get_benchmark_configs;
 use restful_openapi_frameworks_benchmark::config::framework::get_framework_configs;
 use restful_openapi_frameworks_benchmark::solr::{create_solr_client, upload_data_to_solr};
 use std::io::Write;
+use std::path::Path;
 use tokio::signal;
 
 #[tokio::main]
@@ -33,7 +35,7 @@ async fn main() {
     let framework_configs = get_framework_configs().unwrap();
     let benchmark_configs = get_benchmark_configs().unwrap();
     args.custom_validate(
-        &framework_configs
+        framework_configs
             .keys()
             .map(|x| x.as_str())
             .collect::<Vec<&str>>()
@@ -54,24 +56,55 @@ async fn main() {
         signal::ctrl_c().await.unwrap();
         info!("Received Ctrl-C. Stopping containers and exiting")
     } else {
-        let oha_executable = OhaExecutable::new().await.unwrap();
+        build_image(
+            &docker,
+            Path::new("benchmark_server/DockerfileOha"),
+            OHA_CONTAINER_NAME,
+        )
+        .await
+        .unwrap();
+
         for config in framework_configs
             .iter()
             .filter(|(k, _v)| args.frameworks.contains(k) || args.frameworks.is_empty())
         {
-            let container = start_benchmark_container(
+            build_image(
                 &docker,
-                &network,
+                Path::new(config.1.dockerfile.as_str()),
                 config.0.as_str(),
-                config.1,
-                ImageType::Local,
             )
             .await
             .unwrap();
+        }
+
+        for config in framework_configs
+            .iter()
+            .filter(|(k, _v)| args.frameworks.contains(k) || args.frameworks.is_empty())
+        {
             for backend in benchmark_configs.backends.iter() {
+                let container = start_benchmark_container(
+                    &docker,
+                    &network,
+                    config.0.as_str(),
+                    ImageType::Local,
+                    backend.url.as_str(),
+                )
+                .await
+                .unwrap();
                 for benchmark in benchmark_configs.benchmarks.iter() {
                     for setup in benchmark_configs.setups.iter() {
-                        oha_executable.run_benchmark(config.1, backend, benchmark, setup)
+                        let result = run_benchmark(
+                            &docker,
+                            &network,
+                            ImageType::Local,
+                            config.1,
+                            backend,
+                            benchmark,
+                            *setup,
+                        )
+                        .await
+                        .unwrap();
+                        info!("{:?}", result);
                     }
                 }
             }

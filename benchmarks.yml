@@ -1,13 +1,10 @@
 backends:
   - name: direct
-    hostname: varnish
-    port: 80
+    url: http://varnish
   - name: 20 ms delay
-    hostname: speedbump_fast
-    port: 80
+    url: http://speedbump_fast
   - name: 200 ms delay
-    hostname: speedbump_slow
-    port: 80
+    url: http://speedbump_slow
 benchmarks:
   - name: Hello World
     path: /hello_world

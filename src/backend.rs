@@ -32,6 +32,8 @@ const SPEEDBUMP_FAST_COMMAND: &str = "--latency 20ms --port 8984 varnish:8983";
 const SPEEDBUMP_SLOW_CONTAINER_NAME: &str = "restful_api_speedbump_slow";
 const SPEEDBUMP_SLOW_COMMAND: &str = "--latency 200ms --port 8984 varnish:8983";
 
+pub const OHA_CONTAINER_NAME: &str = "restful_api_oha";
+
 pub async fn reset_containers(
     docker: &Docker,
     network_name: &str,
@@ -141,7 +143,7 @@ async fn create_container(
     Ok(container)
 }
 
-async fn build_image(
+pub async fn build_image(
     docker: &Docker,
     path: &Path,
     tag: &str,
@@ -298,21 +300,13 @@ pub async fn start_benchmark_container(
     docker: &Docker,
     network: &Network,
     container_name: &str,
-    config: &FrameworkConfig,
     image_type: ImageType,
+    benchmark_host: &str,
 ) -> Result<Container, docker_api::errors::Error> {
     reset_container(docker, container_name).await;
-    if image_type == ImageType::Local {
-        build_image(
-            docker,
-            Path::new(config.dockerfile.as_str()),
-            container_name,
-        )
-        .await?;
-    }
     let image_tag = image_type.get_tag();
 
-    Ok(create_container(
+    create_container(
         docker,
         network,
         container_name,
@@ -322,7 +316,32 @@ pub async fn start_benchmark_container(
             .image(format!("{container_name}:{image_tag}"))
             .hostname(container_name)
             .name(container_name)
+            .env([format!("BENCHMARK_HOST={benchmark_host}")])
             .build(),
     )
-    .await?)
+    .await
+}
+
+pub async fn start_benchmark_runner_application(
+    docker: &Docker,
+    network: &Network,
+    image_type: ImageType,
+    command: &str,
+) -> Result<Container, docker_api::errors::Error> {
+    reset_container(docker, OHA_CONTAINER_NAME).await;
+    let image_tag = image_type.get_tag();
+
+    create_container(
+        docker,
+        network,
+        OHA_CONTAINER_NAME,
+        OHA_CONTAINER_NAME,
+        image_type,
+        &ContainerCreateOpts::builder()
+            .image(format!("{OHA_CONTAINER_NAME}:{image_tag}"))
+            .name(OHA_CONTAINER_NAME)
+            .command(command.split(' ').collect::<Vec<&str>>().as_slice())
+            .build(),
+    )
+    .await
 }
