@@ -27,6 +27,7 @@ pub struct Setup {
 pub struct BenchmarkConfig {
     pub benchmarks: Vec<Benchmark>,
     pub backends: Vec<Backend>,
+    pub setups: Vec<Setup>,
 }
 
 pub fn get_benchmark_configs() -> Result<BenchmarkConfig, Box<dyn error::Error>> {

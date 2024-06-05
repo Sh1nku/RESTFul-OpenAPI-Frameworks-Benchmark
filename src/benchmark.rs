@@ -1,4 +1,5 @@
-use crate::config::benchmark::{Backend, Benchmark};
+use crate::config::benchmark::{Backend, Benchmark, Setup};
+use crate::config::framework::FrameworkConfig;
 use log::info;
 use std::error::Error;
 use std::os::unix::fs::PermissionsExt;
@@ -57,10 +58,15 @@ impl OhaExecutable {
     }
 
     pub fn run_benchmark(
-        setup: &Backend,
+        &self,
+        framework: &FrameworkConfig,
+        backend: &Backend,
         benchmark: &Benchmark,
-        oha_executable: &OhaExecutable,
-        url: &str,
+        setup: &Setup,
     ) {
+        info!(
+            "Running {}: [{}] [{}] [{} connections] [{} seconds]",
+            framework.name, backend.name, benchmark.name, setup.connections, setup.duration
+        )
     }
 }

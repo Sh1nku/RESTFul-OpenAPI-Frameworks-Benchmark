@@ -54,7 +54,7 @@ async fn main() {
         signal::ctrl_c().await.unwrap();
         info!("Received Ctrl-C. Stopping containers and exiting")
     } else {
-        let oha_executable = OhaExecutable::new().await;
+        let oha_executable = OhaExecutable::new().await.unwrap();
         for config in framework_configs
             .iter()
             .filter(|(k, _v)| args.frameworks.contains(k) || args.frameworks.is_empty())
@@ -68,6 +68,13 @@ async fn main() {
             )
             .await
             .unwrap();
+            for backend in benchmark_configs.backends.iter() {
+                for benchmark in benchmark_configs.benchmarks.iter() {
+                    for setup in benchmark_configs.setups.iter() {
+                        oha_executable.run_benchmark(config.1, backend, benchmark, setup)
+                    }
+                }
+            }
         }
     }
     reset_containers(&docker, NETWORK_NAME).await.unwrap();
