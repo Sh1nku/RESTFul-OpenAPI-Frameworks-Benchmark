@@ -1,25 +1,18 @@
-use crate::argparse::Arguments;
-use crate::backend::{
-    reset_containers, start_backend, start_benchmark_container, ImageType, NETWORK_NAME,
-};
-use crate::benchmark::OhaExecutable;
-use crate::benchmark_config::get_benchmark_configs;
-use crate::framework_config::get_framework_configs;
-use crate::solr::{create_solr_client, upload_data_to_solr};
 use chrono::Local;
 use clap::Parser;
 use docker_api::{ApiVersion, Docker};
 use env_logger::Builder;
 use log::{info, LevelFilter};
+use restful_openapi_frameworks_benchmark::backend::{
+    reset_containers, start_backend, start_benchmark_container, ImageType, NETWORK_NAME,
+};
+use restful_openapi_frameworks_benchmark::benchmark::OhaExecutable;
+use restful_openapi_frameworks_benchmark::config::argparse::Arguments;
+use restful_openapi_frameworks_benchmark::config::benchmark::get_benchmark_configs;
+use restful_openapi_frameworks_benchmark::config::framework::get_framework_configs;
+use restful_openapi_frameworks_benchmark::solr::{create_solr_client, upload_data_to_solr};
 use std::io::Write;
 use tokio::signal;
-
-pub mod argparse;
-pub mod backend;
-pub mod benchmark;
-pub mod benchmark_config;
-pub mod framework_config;
-pub mod solr;
 
 #[tokio::main]
 async fn main() {

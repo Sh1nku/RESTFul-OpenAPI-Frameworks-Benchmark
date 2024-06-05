@@ -1,4 +1,4 @@
-use crate::benchmark_config::{Backend, Benchmark};
+use crate::config::benchmark::{Backend, Benchmark};
 use log::info;
 use std::error::Error;
 use std::os::unix::fs::PermissionsExt;

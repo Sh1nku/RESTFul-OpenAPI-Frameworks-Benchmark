@@ -1,5 +1,5 @@
-use crate::argparse::Arguments;
-use crate::framework_config::FrameworkConfig;
+use crate::config::argparse::Arguments;
+use crate::config::framework::FrameworkConfig;
 use docker_api::opts::{
     ContainerConnectionOpts, ContainerCreateOpts, ContainerRemoveOpts, ContainerStopOpts,
     ImageBuildOpts, NetworkCreateOpts, NetworkListOptsBuilder, PublishPort, PullOpts,
