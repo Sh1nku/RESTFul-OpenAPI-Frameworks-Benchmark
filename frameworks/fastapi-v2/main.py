@@ -1,7 +1,8 @@
+import os
 from typing import Optional, List
 
 import uvicorn as uvicorn
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 import httpx
 from pydantic.main import BaseModel
@@ -9,8 +10,7 @@ from pydantic.main import BaseModel
 client = httpx.AsyncClient()
 app = FastAPI(docs_url='/', redoc_url=None)
 
-# host = 'http://127.0.0.1:25900'
-host = 'http://varnish'
+host = os.getenv('BENCHMARK_HOST', 'http://127.0.0.1:8983')
 
 
 class SubEntity(BaseModel):
@@ -39,11 +39,13 @@ async def json_serialization(document_type: int) -> List[Entity]:
     :param document_type: Some example values: <ul><li><code>1</code></li></ul>
     """
     r = await client.get(
-        host + '/solr/performance/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:' + str(document_type))
+        host + '/solr/performance/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:' + str(
+            document_type))
     return r.json()['response']['docs']
 
 
-@app.get("/anonymization", response_model=List[Entity], response_model_exclude_none=True, summary='Serializing  a json document')
+@app.get("/anonymization", response_model=List[Entity], response_model_exclude_none=True,
+         summary='Serializing  a json document')
 async def anonymization():
     r = await client.get(
         host + '/solr/performance/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:1')

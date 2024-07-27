@@ -70,7 +70,7 @@ async fn json_serialization(
     client: Data<Client>,
     config: Data<Config>,
 ) -> impl Responder {
-    let url: String = format!("{host}/solr/test_data/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:{document_type}", host=config.benchmark_host, document_type=info.document_type);
+    let url: String = format!("{host}/solr/test_data/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:{document_type}", host = config.benchmark_host, document_type = info.document_type);
     let solr = client.get(url).send().await;
     let mut solr = match solr {
         Ok(solr) => solr,
@@ -95,14 +95,14 @@ async fn json_serialization(
 }
 
 #[utoipa::path(
-responses(
-    (status = 200, description = "Doing data processing on a json document", body = [Entity]),
-    (status = 400, description = "Bad Request", body = String),
-    (status = 500, description = "Internal Server Error", body = String)
-))]
+    responses(
+        (status = 200, description = "Doing data processing on a json document", body = [Entity]),
+        (status = 400, description = "Bad Request", body = String),
+        (status = 500, description = "Internal Server Error", body = String)
+    ))]
 #[get("/anonymization")]
 async fn anonymization(client: Data<Client>, config: Data<Config>) -> impl Responder {
-    let url: String = format!("{host}/solr/test_data/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:1", host=config.benchmark_host);
+    let url: String = format!("{host}/solr/test_data/select?fl=id,document_type,int_array,string_array,child_objects,name,number,[child]&q=*:*&rows=100&fq=document_type:1", host = config.benchmark_host);
     let solr = client.get(url).send().await.map_err(|e| {
         HttpResponse::InternalServerError().body(format!("Failed to fetch Solr data: {}", e))
     });
@@ -141,7 +141,7 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             benchmark_host: std::env::var("BENCHMARK_HOST")
-                .unwrap_or("http://localhost:8983".to_string()),
+                .unwrap_or("http://127.0.0.1:8983'".to_string()),
         }
     }
 }
@@ -149,7 +149,7 @@ impl Default for Config {
 #[derive(OpenApi)]
 #[openapi(
     paths(hello_world, json_serialization, anonymization),
-    components(schemas(Entity, SubEntity),)
+    components(schemas(Entity, SubEntity), )
 )]
 struct ApiDoc;
 
@@ -165,7 +165,7 @@ async fn main() -> std::io::Result<()> {
             .service(json_serialization)
             .service(anonymization)
     })
-    .bind("0.0.0.0:8080")?
-    .run()
-    .await
+        .bind("0.0.0.0:8080")?
+        .run()
+        .await
 }

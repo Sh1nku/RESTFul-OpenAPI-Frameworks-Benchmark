@@ -1,5 +1,4 @@
 use crate::config::argparse::Arguments;
-use crate::config::framework::FrameworkConfig;
 use docker_api::opts::{
     ContainerConnectionOpts, ContainerCreateOpts, ContainerRemoveOpts, ContainerStopOpts,
     ImageBuildOpts, NetworkCreateOpts, NetworkListOptsBuilder, PublishPort, PullOpts,
@@ -201,7 +200,7 @@ pub async fn start_backend(
             ])
             .build(),
     )
-    .await?;
+        .await?;
     create_container(
         docker,
         &network,
@@ -220,7 +219,7 @@ pub async fn start_backend(
             .env(["ZK_HOST=zookeeper", "SOLR_JAVA_MEM=-Xms512m -Xmx512m"])
             .build(),
     )
-    .await?;
+        .await?;
     create_container(
         docker,
         &network,
@@ -237,7 +236,7 @@ pub async fn start_backend(
             )])
             .build(),
     )
-    .await?;
+        .await?;
     if !arguments.development {
         create_container(
             docker,
@@ -257,7 +256,7 @@ pub async fn start_backend(
                 )
                 .build(),
         )
-        .await?;
+            .await?;
         create_container(
             docker,
             &network,
@@ -276,7 +275,7 @@ pub async fn start_backend(
                 )
                 .build(),
         )
-        .await?;
+            .await?;
     }
     Ok(network)
 }
@@ -319,7 +318,7 @@ pub async fn start_benchmark_container(
             .env([format!("BENCHMARK_HOST={benchmark_host}")])
             .build(),
     )
-    .await
+        .await
 }
 
 pub async fn start_benchmark_runner_application(
@@ -343,5 +342,5 @@ pub async fn start_benchmark_runner_application(
             .command(command.split(' ').collect::<Vec<&str>>().as_slice())
             .build(),
     )
-    .await
+        .await
 }
