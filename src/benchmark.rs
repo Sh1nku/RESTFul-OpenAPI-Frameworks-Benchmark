@@ -12,11 +12,10 @@ pub async fn run_benchmark(
     docker: &Docker,
     network: &Network,
     image_type: ImageType,
-
     framework: &FrameworkConfig,
     backend: &Backend,
     benchmark: &Benchmark,
-    setup: Setup,
+    setup: &Setup,
 ) -> Result<BenchmarkResult, Box<dyn Error>> {
     info!(
         "Running {}: [{}] [{}] [{} connections] [{} seconds]",
@@ -30,9 +29,9 @@ pub async fn run_benchmark(
             "oha -z {}s -c {} --latency-correction --disable-keepalive --no-tui -j {}{}",
             setup.duration, setup.connections, framework.url, benchmark.path
         )
-        .as_str(),
+            .as_str(),
     )
-    .await?;
+        .await?;
     result.wait().await?;
     let reader = result.logs(&LogsOptsBuilder::default().stdout(true).stderr(true).build());
     let logs = reader
@@ -47,7 +46,7 @@ pub async fn run_benchmark(
     Ok(BenchmarkResult {
         benchmark_name: benchmark.name.clone(),
         framework_name: framework.name.clone(),
-        setup,
+        setup: setup.clone(),
         stats: result,
     })
 }

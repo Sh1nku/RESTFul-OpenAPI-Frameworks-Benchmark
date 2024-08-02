@@ -1,27 +1,37 @@
 backends:
-  - name: direct
+  - id: direct
+    name: direct
     url: http://varnish
-  - name: 20 ms delay
+  - id: 20ms_delay
+    name: 20 ms delay
     url: http://speedbump_fast
-  - name: 200 ms delay
+  - id: 200ms_delay
+    name: 200 ms delay
     url: http://speedbump_slow
 benchmarks:
-  - name: Hello World
+  - id: hello_world
+    name: Hello World
     path: /hello_world
-  - name: Json Serialization
+  - id: json_serialization
+    name: Json Serialization
     path: /json_serialization?document_type=1
-  - name: Anonymization
+  - id: anonymization
+    name: Anonymization
     path: /anonymization
 setups:
-  - name: 20 connections 60 seconds
+  - id: 20_connections_60_seconds
+    name: 20 connections 60 seconds
     connections: 20
     duration: 60
-  - name: 100 connections 60 seconds
+  - id: 100_connections_60_seconds
+    name: 100 connections 60 seconds
     connections: 100
     duration: 60
-  - name: 500 connections 60 seconds
+  - id: 500_connections_60_seconds
+    name: 500 connections 60 seconds
     connections: 500
     duration: 60
-  - name: 2000 connections 60 seconds
+  - id: 2000_connections_60_seconds
+    name: 2000 connections 60 seconds
     connections: 2000
     duration: 60

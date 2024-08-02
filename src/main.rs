@@ -40,8 +40,26 @@ async fn main() {
             .map(|x| x.as_str())
             .collect::<Vec<&str>>()
             .as_slice(),
+        benchmark_configs
+            .benchmarks
+            .iter()
+            .map(|x| x.id.as_str())
+            .collect::<Vec<&str>>()
+            .as_slice(),
+        benchmark_configs
+            .backends
+            .iter()
+            .map(|x| x.id.as_str())
+            .collect::<Vec<&str>>()
+            .as_slice(),
+        benchmark_configs
+            .setups
+            .iter()
+            .map(|x| x.id.as_str())
+            .collect::<Vec<&str>>()
+            .as_slice(),
     )
-    .unwrap();
+        .unwrap();
     //TODO Dynamically determine Docker version?
     let docker = Docker::unix_versioned(
         "/var/run/docker.sock",
@@ -61,8 +79,8 @@ async fn main() {
             Path::new("benchmark_server/DockerfileOha"),
             OHA_CONTAINER_NAME,
         )
-        .await
-        .unwrap();
+            .await
+            .unwrap();
 
         for config in framework_configs
             .iter()
@@ -73,26 +91,26 @@ async fn main() {
                 Path::new(config.1.dockerfile.as_str()),
                 config.0.as_str(),
             )
-            .await
-            .unwrap();
+                .await
+                .unwrap();
         }
 
         for config in framework_configs
             .iter()
             .filter(|(k, _v)| args.frameworks.contains(k) || args.frameworks.is_empty())
         {
-            for backend in benchmark_configs.backends.iter() {
-                let container = start_benchmark_container(
+            for backend in benchmark_configs.backends.iter().filter(|x| args.backends.contains(&x.id) || args.backends.is_empty()) {
+                let _ = start_benchmark_container(
                     &docker,
                     &network,
                     config.0.as_str(),
                     ImageType::Local,
                     backend.url.as_str(),
                 )
-                .await
-                .unwrap();
-                for benchmark in benchmark_configs.benchmarks.iter() {
-                    for setup in benchmark_configs.setups.iter() {
+                    .await
+                    .unwrap();
+                for benchmark in benchmark_configs.benchmarks.iter().filter(|x| args.benchmarks.contains(&x.id) || args.benchmarks.is_empty()) {
+                    for setup in benchmark_configs.setups.iter().filter(|x| args.setups.contains(&x.id) || args.setups.is_empty()) {
                         let result = run_benchmark(
                             &docker,
                             &network,
@@ -100,10 +118,10 @@ async fn main() {
                             config.1,
                             backend,
                             benchmark,
-                            *setup,
+                            setup,
                         )
-                        .await
-                        .unwrap();
+                            .await
+                            .unwrap();
                         info!("{:?}", result);
                     }
                 }

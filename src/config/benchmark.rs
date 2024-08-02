@@ -6,18 +6,21 @@ use std::path::Path;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub struct Benchmark {
+    pub id: String,
     pub name: String,
     pub path: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub struct Backend {
+    pub id: String,
     pub name: String,
     pub url: String,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub struct Setup {
+    pub id: String,
     pub connections: u32,
     pub duration: u32,
 }

@@ -18,12 +18,30 @@ pub struct Arguments {
     /// Specify which frameworks to run
     #[clap(long, conflicts_with = "development")]
     pub frameworks: Vec<String>,
+    /// Specify which benchmarks to run
+    #[clap(long, conflicts_with = "development")]
+    pub benchmarks: Vec<String>,
+    /// Specify which backends to run
+    #[clap(long, conflicts_with = "development")]
+    pub backends: Vec<String>,
+    /// Specify which setups to run
+    #[clap(long, conflicts_with = "development")]
+    pub setups: Vec<String>,
 }
 
 impl Arguments {
-    pub fn custom_validate(&self, framework_configs: &[&str]) -> Result<(), String> {
+    pub fn custom_validate(&self, framework_configs: &[&str], benchmarks_configs: &[&str], backends: &[&str], setups: &[&str]) -> Result<(), String> {
         for framework in &self.frameworks {
             validate_list(framework, framework_configs)?;
+        }
+        for benchmark in &self.benchmarks {
+            validate_list(benchmark, benchmarks_configs)?;
+        }
+        for backend in &self.backends {
+            validate_list(backend, backends)?;
+        }
+        for setup in &self.setups {
+            validate_list(setup, setups)?;
         }
         Ok(())
     }
